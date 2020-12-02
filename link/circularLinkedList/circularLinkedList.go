@@ -1,4 +1,4 @@
-package main
+package circularLinkedList
 
 // 无头指针的循环链表
 
@@ -14,9 +14,10 @@ var (
 type CircularLinkedList interface {
 	Add(position int, data interface{}) error
 	AddAtEnd(data interface{})
-	Delete(position int) (interface{}, error)
+	Delete(position int) (*CNode, error)
 	DeleteAtEnd() interface{}
 	GetElem(position int) (interface{}, error)
+	//todo : GetAll()
 	Len() int
 }
 
@@ -25,14 +26,14 @@ type CNode struct {
 	Next *CNode
 }
 
-func init() {
-	var a CNode
-	var b CircularLinkedList
-	b = &a
-	fmt.Println(b)
-}
+//func init() {
+//	var a CNode
+//	var b CircularLinkedList
+//	b = &a
+//	fmt.Println(b)
+//}
 
-func InitCircularLinkedList() *CNode {
+func Init() *CNode {
 	cNode := &CNode{
 		Data: nil,
 		Next: nil,
@@ -66,11 +67,22 @@ func (linkList *CNode) Add(position int, data interface{}) error {
 	return nil
 }
 
+func (linkList *CNode) Print() {
+	ll := linkList
+
+	for ll.Next != linkList {
+		fmt.Println(ll.Data)
+		ll = ll.Next
+	}
+
+	fmt.Println(ll.Data)
+}
+
 func (linkList *CNode) AddAtEnd(data interface{}) {
 	_ = linkList.Add(linkList.Len()+1, data)
 }
 
-func (linkList *CNode) Delete(position int) (interface{}, error) {
+func (linkList *CNode) Delete(position int) (*CNode, error) {
 	ll := linkList
 
 	if position < 1 {
@@ -85,9 +97,9 @@ func (linkList *CNode) Delete(position int) (interface{}, error) {
 		ll = ll.Next
 	}
 
-	data := ll.Next.Data
+	deleteNode := ll.Next
 	ll.Next = ll.Next.Next
-	return data, nil
+	return deleteNode, nil
 }
 
 func (linkList *CNode) DeleteAtEnd() interface{} {

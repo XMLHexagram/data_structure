@@ -1,7 +1,8 @@
-package main
+package josephus
 
 import (
 	"fmt"
+	"github.com/lmx-Hexagram/data_structure/link/circularLinkedList"
 )
 
 type Data struct {
@@ -9,12 +10,13 @@ type Data struct {
 	Code int
 }
 
-func main() {
+func Go() {
 	// 约瑟夫环 Josephus problem
-	linkList := initLinkList()
 	var startAt int
 	var number int
-	id := 0
+	var id int
+	ll := circularLinkedList.Init()
+	fmt.Println(ll.Len())
 
 	fmt.Print("start at:")
 	_, _ = fmt.Scanf("%d", &startAt)
@@ -25,42 +27,37 @@ func main() {
 			break
 		}
 		id++
-		linkList.addAtEnd(Data{
+		ll.AddAtEnd(Data{
 			ID:   id,
 			Code: number,
 		})
-	}
-	linkList.print()
 
-	dealJosephus(linkList, startAt)
+	}
+
+	ll.Print()
+	fmt.Println("############################")
+	dealJosephus(ll, startAt)
+
 }
 
-func dealJosephus(linkList *LinkNode, startAt int) {
+func dealJosephus(linkList *circularLinkedList.CNode, startAt int) {
 	var nowPosition = startAt
-	var length = linkList.len()
-	fmt.Println(linkList.len())
+	var length = linkList.Len()
 
-	linkList, data := linkList.delete(nowPosition - 1)
-	fmt.Println("kill:", data.ID, ";code:", data.Code)
+	//linkList.Print()
+
+	node, _ := linkList.Delete(nowPosition + 1)
+
+	fmt.Println("kill:", node.Data.(Data).ID, ";code:", node.Data.(Data).Code)
+	//linkList.Print()
 	length--
 
 	for ; length > 1; length-- {
-		nowPosition = data.Code
+		nowPosition = node.Data.(Data).Code
 
-		linkList, data = linkList.delete(nowPosition)
-		fmt.Println("kill:", data.ID, ";code:", data.Code)
+		node, _ = node.Delete(nowPosition + 1)
+		fmt.Println("kill:", node.Data.(Data).ID, ";code:", node.Data.(Data).Code)
 	}
-	fmt.Println("alive:", linkList.getElem(1).ID, ";code:", linkList.getElem(1).Code)
-}
-
-func initLinkList() *LinkNode {
-	linkList := &LinkNode{
-		data: Data{
-			ID:   -1,
-			Code: 0,
-		},
-		nextNode: nil,
-	}
-	linkList.nextNode = linkList
-	return linkList
+	data, _ := linkList.GetElem(1)
+	fmt.Println("alive:", data.(Data).ID, ";code:", data.(Data).Code)
 }
