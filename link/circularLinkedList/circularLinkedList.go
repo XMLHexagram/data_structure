@@ -25,7 +25,7 @@ type CNode struct {
 	Next *CNode
 }
 
-func main() {
+func init() {
 	var a CNode
 	var b CircularLinkedList
 	b = &a

@@ -84,7 +84,7 @@ func TestCNode_Delete(t *testing.T) {
 		}
 	}
 
-	data ,_ := ll.Delete(ll.Len())
+	data, _ := ll.Delete(ll.Len())
 	if data.(Data).ID != 20 {
 		t.FailNow()
 	}
