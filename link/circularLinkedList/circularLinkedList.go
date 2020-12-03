@@ -96,6 +96,12 @@ func (linkList *CNode) Delete(position int) (*CNode, error) {
 	//	position = linkList.Len() + 1
 	//}
 
+	if position == 1 {
+		for ll.Next != linkList {
+			ll = ll.Next
+		}
+	}
+
 	for i := 1; i < position-1; i++ {
 		ll = ll.Next
 		//fmt.Println("*")
