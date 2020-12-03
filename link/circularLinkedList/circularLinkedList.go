@@ -15,8 +15,8 @@ type CircularLinkedList interface {
 	Add(position int, data interface{}) error
 	AddAtEnd(data interface{})
 	Delete(position int) (*CNode, error)
-	DeleteAtEnd() interface{}
-	GetElem(position int) (interface{}, error)
+	DeleteAtEnd() *CNode
+	GetNode(position int) (*CNode, error)
 	//todo : GetAll()
 	Len() int
 }
@@ -26,12 +26,12 @@ type CNode struct {
 	Next *CNode
 }
 
-//func init() {
-//	var a CNode
-//	var b CircularLinkedList
-//	b = &a
-//	fmt.Println(b)
-//}
+func init() {
+	var a CircularLinkedList
+	var b CNode
+	a = &b
+	fmt.Print(a)
+}
 
 func Init() *CNode {
 	cNode := &CNode{
@@ -43,6 +43,13 @@ func Init() *CNode {
 	return cNode
 }
 
+func (linkList *CNode) IsInitial() bool {
+	if linkList.Next == linkList && linkList.Data == nil {
+		return true
+	}
+	return false
+}
+
 func (linkList *CNode) Add(position int, data interface{}) error {
 	ll := linkList
 
@@ -50,9 +57,16 @@ func (linkList *CNode) Add(position int, data interface{}) error {
 		return ErrorInvalidPosition
 	}
 
-	if position == 1 {
+	if linkList.IsInitial() {
 		ll.Data = data
 		return nil
+	}
+
+	if position == 1 {
+		for ll.Next != linkList {
+			ll = ll.Next
+		}
+
 	}
 
 	for i := 1; i < position-1; i++ {
@@ -64,6 +78,7 @@ func (linkList *CNode) Add(position int, data interface{}) error {
 		Next: ll.Next,
 	}
 	ll.Next = newNode
+	
 	return nil
 }
 
@@ -92,10 +107,6 @@ func (linkList *CNode) Delete(position int) (*CNode, error) {
 		return nil, ErrorInvalidPosition
 	}
 
-	//if position == 1 {
-	//	position = linkList.Len() + 1
-	//}
-
 	if position == 1 {
 		for ll.Next != linkList {
 			ll = ll.Next
@@ -112,12 +123,12 @@ func (linkList *CNode) Delete(position int) (*CNode, error) {
 	return deleteNode, nil
 }
 
-func (linkList *CNode) DeleteAtEnd() interface{} {
-	data, _ := linkList.Delete(linkList.Len())
-	return data
+func (linkList *CNode) DeleteAtEnd() *CNode {
+	deleteNode, _ := linkList.Delete(linkList.Len())
+	return deleteNode
 }
 
-func (linkList *CNode) GetElem(position int) (interface{}, error) {
+func (linkList *CNode) GetNode(position int) (*CNode, error) {
 	ll := linkList
 
 	if position < 1 {
@@ -128,7 +139,7 @@ func (linkList *CNode) GetElem(position int) (interface{}, error) {
 		ll = ll.Next
 	}
 
-	return ll.Data, nil
+	return ll, nil
 }
 
 func (linkList *CNode) Len() int {
