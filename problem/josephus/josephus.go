@@ -15,7 +15,7 @@ func Go() {
 	var startAt int
 	var code int
 	ll := circularLinkedList.Init()
-	fmt.Println(ll.Len())
+	//fmt.Println(ll.Len())
 
 	fmt.Print("start at:")
 	_, _ = fmt.Scanf("%d", &startAt)
@@ -41,11 +41,10 @@ func Go() {
 
 	//ll.Next.Print()
 	//fmt.Println("############################")
-	dealJosephus(ll, startAt)
-
+	DealJosephus(startAt,ll)
 }
 
-func dealJosephus(linkList *circularLinkedList.CNode, startAt int) {
+func DealJosephus(startAt int,linkList *circularLinkedList.CNode,) {
 	var step = startAt
 	var length = linkList.Len()
 
