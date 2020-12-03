@@ -14,37 +14,38 @@ func Go() {
 	// 约瑟夫环 Josephus problem
 	var startAt int
 	var code int
-	ll := circularLinkedList.Init()
-	//fmt.Println(ll.Len())
+
+	var inputCode []int
 
 	fmt.Print("start at:")
 	_, _ = fmt.Scanf("%d", &startAt)
 	fmt.Print("input:")
-	for i:=1;;i++{
+	for i := 1; ; i++ {
 		_, _ = fmt.Scanf("%d", &code)
 		if code == -1 {
 			break
 		}
-		if i == 1{
-			ll.Data = Data{
-				ID:   i,
-				Code: code,
-			}
-			continue
-		}
 
-		ll.AddAtEnd(Data{
-			ID:   i,
-			Code: code,
-		})
+		inputCode = append(inputCode, code)
 	}
 
-	//ll.Next.Print()
-	//fmt.Println("############################")
-	DealJosephus(startAt,ll)
+	ll := CreateJosephus(inputCode)
+	DealJosephus(startAt, ll)
 }
 
-func DealJosephus(startAt int,linkList *circularLinkedList.CNode,) {
+func CreateJosephus(testInput []int) *circularLinkedList.CNode {
+	ll := circularLinkedList.Init()
+	for i := 1; i <= len(testInput); i++ {
+		fmt.Println(testInput[i-1])
+		ll.AddAtEnd(Data{
+			ID:   i,
+			Code: testInput[i-1],
+		})
+	}
+	return ll
+}
+
+func DealJosephus(startAt int, linkList *circularLinkedList.CNode) {
 	var step = startAt
 	var length = linkList.Len()
 
