@@ -11,7 +11,7 @@ type Data struct {
 func initTestLinkedList(length int) *CNode {
 	ll := Init()
 	for i := 1; i <= length; i++ {
-		_ = ll.Add(i, Data{
+		ll, _ = ll.Add(i, Data{
 			ID: i,
 		})
 	}
@@ -39,40 +39,51 @@ func TestCNode_Add(t *testing.T) {
 		ID: 99,
 	}
 
-	var length = 20
-
-	addAndCheck := func(position int,data Data,t *testing.T) {
+	addAndCheck := func(length int, position int, data Data, t *testing.T) {
 		ll := initTestLinkedList(length)
-		err := ll.Add(position, testData)
+		ll, err := ll.Add(position, data)
 
 		if err != nil {
 			t.Error(err)
 		}
-		node ,err:= ll.GetNode(position)
-		if node.Data.(Data).ID != testData.ID {
+		node, err := ll.GetNode(position)
+		if node.Data.(Data).ID != data.ID {
 			t.Fail()
 		}
-		ll.Print()
 	}
 
 	var normal = "normal "
-	t.Run(normal+"At 1", func(t *testing.T) {
-		var position = 1
+	{
+		var length = 10
 
-		addAndCheck(position,testData,t)
-	})
+		t.Run(normal+"At 1", func(t *testing.T) {
+			var position = 1
 
-	t.Run(normal+"At middle", func(t *testing.T) {
-		position := length/2
+			addAndCheck(length, position, testData, t)
+		})
 
-		addAndCheck(position,testData,t)
-	})
+		t.Run(normal+"At middle", func(t *testing.T) {
+			position := length / 2
 
-	t.Run(normal+"At End", func(t *testing.T) {
-		var position = length +1
+			addAndCheck(length, position, testData, t)
+		})
 
-		addAndCheck(position,testData,t)
-	})
+		t.Run(normal+"At End", func(t *testing.T) {
+			var position = length + 1
+
+			addAndCheck(length, position, testData, t)
+		})
+	}
+
+	var initial = "initial"
+	{
+		var length = 0
+		t.Run(initial+"At 1", func(t *testing.T) {
+			var position = 1
+
+			addAndCheck(length, position, testData, t)
+		})
+	}
 }
 
 func TestCNode_AddAtEnd(t *testing.T) {
@@ -81,7 +92,8 @@ func TestCNode_AddAtEnd(t *testing.T) {
 	testData := Data{
 		ID: 99,
 	}
-	ll.AddAtEnd(testData)
+
+	ll = ll.AddAtEnd(testData)
 	node, _ := ll.GetNode(ll.Len())
 	if node.Data.(Data).ID != testData.ID {
 		t.FailNow()
@@ -89,11 +101,65 @@ func TestCNode_AddAtEnd(t *testing.T) {
 }
 
 func TestCNode_Delete(t *testing.T) {
-	ll := initTestLinkedList(20)
+	deleteAndCheck := func(length int, position int, data Data, t *testing.T) {
+		ll := initTestLinkedList(length)
+		node, err := ll.Delete(position)
 
-	deleteNode, _ := ll.Delete(ll.Len())
-	if deleteNode.Data.(Data).ID != 20 {
-		t.FailNow()
+		if err != nil {
+			t.Error(err)
+		}
+
+		if node.Data.(Data).ID != data.ID {
+			t.Fail()
+		}
+	}
+
+	var normal = "normal "
+	{
+		var length = 10
+
+		t.Run(normal+"At 1", func(t *testing.T) {
+			var position = 1
+
+			deleteAndCheck(length, position, Data{
+				ID: 1,
+			}, t)
+		})
+
+		t.Run(normal+"At middle", func(t *testing.T) {
+			position := length / 2
+
+			deleteAndCheck(length, position, Data{
+				ID: position,
+			}, t)
+		})
+
+		t.Run(normal+"At End", func(t *testing.T) {
+			var position = length
+
+			deleteAndCheck(length, position, Data{
+				ID: position,
+			}, t)
+		})
+	}
+
+	var initial = "initial "
+	{
+		var length = 0
+		t.Run(initial+"At 1", func(t *testing.T) {
+			var position = 1
+
+			ll := initTestLinkedList(length)
+			ll, err := ll.Delete(position)
+
+			if err != nil {
+				t.Error(err)
+			}
+
+			if ll.Data != nil {
+				t.Fail()
+			}
+		})
 	}
 }
 

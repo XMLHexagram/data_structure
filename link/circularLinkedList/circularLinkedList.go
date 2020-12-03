@@ -12,11 +12,12 @@ var (
 )
 
 type CircularLinkedList interface {
-	Add(position int, data interface{}) error
-	AddAtEnd(data interface{})
+	Add(position int, data interface{}) (*CNode,error)
+	AddAtEnd(data interface{}) *CNode
 	Delete(position int) (*CNode, error)
 	DeleteAtEnd() *CNode
 	GetNode(position int) (*CNode, error)
+	IsInitial() bool
 	//todo : GetAll()
 	Len() int
 }
@@ -26,12 +27,12 @@ type CNode struct {
 	Next *CNode
 }
 
-func init() {
-	var a CircularLinkedList
-	var b CNode
-	a = &b
-	fmt.Print(a)
-}
+//func init() {
+//	var a CircularLinkedList
+//	var b CNode
+//	a = &b
+//	fmt.Print(a)
+//}
 
 func Init() *CNode {
 	cNode := &CNode{
@@ -50,23 +51,22 @@ func (linkList *CNode) IsInitial() bool {
 	return false
 }
 
-func (linkList *CNode) Add(position int, data interface{}) error {
+func (linkList *CNode) Add(position int, data interface{}) (*CNode,error) {
 	ll := linkList
 
 	if position < 1 {
-		return ErrorInvalidPosition
+		return linkList,ErrorInvalidPosition
 	}
 
 	if linkList.IsInitial() {
 		ll.Data = data
-		return nil
+		return linkList,nil
 	}
 
 	if position == 1 {
 		for ll.Next != linkList {
 			ll = ll.Next
 		}
-
 	}
 
 	for i := 1; i < position-1; i++ {
@@ -78,8 +78,12 @@ func (linkList *CNode) Add(position int, data interface{}) error {
 		Next: ll.Next,
 	}
 	ll.Next = newNode
-	
-	return nil
+
+	if position  == 1{
+		return ll.Next,nil
+	}
+
+	return linkList,nil
 }
 
 func (linkList *CNode) Print() {
@@ -95,8 +99,9 @@ func (linkList *CNode) Print() {
 	fmt.Println("###")
 }
 
-func (linkList *CNode) AddAtEnd(data interface{}) {
-	_ = linkList.Add(linkList.Len()+1, data)
+func (linkList *CNode) AddAtEnd(data interface{}) *CNode{
+	ll,_ := linkList.Add(linkList.Len()+1, data)
+	return ll
 }
 
 // todo： delete 1的时候的非预期行为
