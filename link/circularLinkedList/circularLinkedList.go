@@ -70,18 +70,21 @@ func (linkList *CNode) Add(position int, data interface{}) error {
 func (linkList *CNode) Print() {
 	ll := linkList
 
+	fmt.Println("###")
 	for ll.Next != linkList {
 		fmt.Println(ll.Data)
 		ll = ll.Next
 	}
 
 	fmt.Println(ll.Data)
+	fmt.Println("###")
 }
 
 func (linkList *CNode) AddAtEnd(data interface{}) {
 	_ = linkList.Add(linkList.Len()+1, data)
 }
 
+// todo： delete 1的时候的非预期行为
 func (linkList *CNode) Delete(position int) (*CNode, error) {
 	ll := linkList
 
@@ -89,12 +92,13 @@ func (linkList *CNode) Delete(position int) (*CNode, error) {
 		return nil, ErrorInvalidPosition
 	}
 
-	if position == 1 {
-		position = linkList.Len() + 1
-	}
+	//if position == 1 {
+	//	position = linkList.Len() + 1
+	//}
 
 	for i := 1; i < position-1; i++ {
 		ll = ll.Next
+		//fmt.Println("*")
 	}
 
 	deleteNode := ll.Next

@@ -13,51 +13,62 @@ type Data struct {
 func Go() {
 	// 约瑟夫环 Josephus problem
 	var startAt int
-	var number int
-	var id int
+	var code int
 	ll := circularLinkedList.Init()
 	fmt.Println(ll.Len())
 
 	fmt.Print("start at:")
 	_, _ = fmt.Scanf("%d", &startAt)
 	fmt.Print("input:")
-	for {
-		_, _ = fmt.Scanf("%d", &number)
-		if number == -1 {
+	for i:=1;;i++{
+		_, _ = fmt.Scanf("%d", &code)
+		if code == -1 {
 			break
 		}
-		id++
-		ll.AddAtEnd(Data{
-			ID:   id,
-			Code: number,
-		})
+		if i == 1{
+			ll.Data = Data{
+				ID:   i,
+				Code: code,
+			}
+			continue
+		}
 
+		ll.AddAtEnd(Data{
+			ID:   i,
+			Code: code,
+		})
 	}
 
-	ll.Print()
-	fmt.Println("############################")
+	//ll.Next.Print()
+	//fmt.Println("############################")
 	dealJosephus(ll, startAt)
 
 }
 
 func dealJosephus(linkList *circularLinkedList.CNode, startAt int) {
-	var nowPosition = startAt
+	var step = startAt
 	var length = linkList.Len()
 
 	//linkList.Print()
 
-	node, _ := linkList.Delete(nowPosition + 1)
+	node, _ := linkList.Delete(step)
 
 	fmt.Println("kill:", node.Data.(Data).ID, ";code:", node.Data.(Data).Code)
 	//linkList.Print()
+	//node.Next.Print()
 	length--
 
-	for ; length > 1; length-- {
-		nowPosition = node.Data.(Data).Code
+	for ; length > 0; length-- {
+		step = node.Data.(Data).Code
 
-		node, _ = node.Delete(nowPosition + 1)
+		node, _ = node.Next.Delete(step)
+		//node.Next.Print()
+		//fmt.Println(node.Next.Len())
+		//fmt.Println("###################")
 		fmt.Println("kill:", node.Data.(Data).ID, ";code:", node.Data.(Data).Code)
 	}
-	data, _ := linkList.GetElem(1)
-	fmt.Println("alive:", data.(Data).ID, ";code:", data.(Data).Code)
+
+	//node.Next.Print()
+	//data := node.Next.Next.Data
+	//fmt.Println("alive:", data.(Data).ID, ";code:", data.(Data).Code)
 }
