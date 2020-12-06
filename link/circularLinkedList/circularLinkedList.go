@@ -11,8 +11,8 @@ var (
 	ErrorInvalidPosition = errors.New("invalid position")
 )
 
-type CircularLinkedList interface {
-	Add(position int, data interface{}) (*CNode,error)
+type ADT interface {
+	Add(position int, data interface{}) (*CNode, error)
 	AddAtEnd(data interface{}) *CNode
 	Delete(position int) (*CNode, error)
 	DeleteAtEnd() *CNode
@@ -28,7 +28,7 @@ type CNode struct {
 }
 
 //func init() {
-//	var a CircularLinkedList
+//	var a ADT
 //	var b CNode
 //	a = &b
 //	fmt.Print(a)
@@ -51,16 +51,16 @@ func (linkList *CNode) IsInitial() bool {
 	return false
 }
 
-func (linkList *CNode) Add(position int, data interface{}) (*CNode,error) {
+func (linkList *CNode) Add(position int, data interface{}) (*CNode, error) {
 	ll := linkList
 
 	if position < 1 {
-		return linkList,ErrorInvalidPosition
+		return linkList, ErrorInvalidPosition
 	}
 
 	if linkList.IsInitial() {
 		ll.Data = data
-		return linkList,nil
+		return linkList, nil
 	}
 
 	if position == 1 {
@@ -79,11 +79,11 @@ func (linkList *CNode) Add(position int, data interface{}) (*CNode,error) {
 	}
 	ll.Next = newNode
 
-	if position  == 1{
-		return ll.Next,nil
+	if position == 1 {
+		return ll.Next, nil
 	}
 
-	return linkList,nil
+	return linkList, nil
 }
 
 func (linkList *CNode) Print() {
@@ -99,8 +99,8 @@ func (linkList *CNode) Print() {
 	fmt.Println("###")
 }
 
-func (linkList *CNode) AddAtEnd(data interface{}) *CNode{
-	ll,_ := linkList.Add(linkList.Len()+1, data)
+func (linkList *CNode) AddAtEnd(data interface{}) *CNode {
+	ll, _ := linkList.Add(linkList.Len()+1, data)
 	return ll
 }
 
