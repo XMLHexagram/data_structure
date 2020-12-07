@@ -1,7 +1,11 @@
 package main
 
-import "github.com/lmx-Hexagram/data_structure/problem/josephus"
+import (
+	"github.com/lmx-Hexagram/data_structure/problem/devilLanguage"
+	//"github.com/lmx-Hexagram/data_structure/problem/josephus"
+)
 
 func main() {
-	josephus.Go()
+	devilLanguage.Go()
+	//josephus.Go()
 }
