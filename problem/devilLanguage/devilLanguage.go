@@ -26,10 +26,17 @@ var simplifyMap = map[rune]string{
 func Go() {
 	var devilSentence string
 
-	resultS := stack.Init()
-	initS := stack.Init()
-	tempS := stack.Init()
+	fmt.Println("input devil language:")
+	_, _ = fmt.Scanln(&devilSentence)
 
+	resultS := DealDevilLanguage(devilSentence)
+
+	for !resultS.IsEmpty() {
+		fmt.Print(string(resultS.Pop().(rune)))
+	}
+}
+
+func DealDevilLanguage(devilSentence string) *stack.Stack {
 	var expandString string
 	for _, v := range simplifyMap['B'] {
 		if v == 'A' {
@@ -40,8 +47,9 @@ func Go() {
 	}
 	simplifyMap['B'] = expandString
 
-	fmt.Println("start")
-	_, _ = fmt.Scanln(&devilSentence)
+	resultS := stack.Init()
+	initS := stack.Init()
+	tempS := stack.Init()
 
 	for _, v := range devilSentence {
 		initS.Push(v)
@@ -50,11 +58,12 @@ func Go() {
 	for !initS.IsEmpty() {
 		char := initS.Pop().(rune)
 
-		if char > rune('A') && char < rune('Z') {
+		if char > 'A' && char < 'Z' {
 			temp := simplifyMap[char]
 			for i := len(temp); i > 0; i-- {
 				resultS.Push(rune(temp[i-1]))
 			}
+			continue
 		}
 
 		if char == ')' {
@@ -70,11 +79,10 @@ func Go() {
 				resultS.Push(tempS.Pop().(rune))
 				resultS.Push(repeatChar)
 			}
+			continue
 		}
-		//s.Push(char)
+		resultS.Push(char)
 	}
 
-	for !resultS.IsEmpty() {
-		fmt.Print(string(resultS.Pop().(rune)))
-	}
+	return resultS
 }
