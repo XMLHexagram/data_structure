@@ -30,13 +30,16 @@ func Go() {
 	}
 
 	ll := CreateJosephus(inputCode)
-	DealJosephus(startAt, ll)
+	list := DealJosephus(startAt, ll)
+	for _, v := range list {
+		fmt.Printf("kill: %d,Code: %d\n",v.Kill,v.Code)
+	}
 }
 
 func CreateJosephus(testInput []int) *circularLinkedList.CNode {
 	ll := circularLinkedList.Init()
 	for i := 1; i <= len(testInput); i++ {
-		fmt.Println(testInput[i-1])
+		//fmt.Println(testInput[i-1])
 		ll.AddAtEnd(Data{
 			ID:   i,
 			Code: testInput[i-1],
@@ -45,7 +48,13 @@ func CreateJosephus(testInput []int) *circularLinkedList.CNode {
 	return ll
 }
 
-func DealJosephus(startAt int, linkList *circularLinkedList.CNode) {
+type List struct {
+	Kill int
+	Code int
+}
+
+func DealJosephus(startAt int, linkList *circularLinkedList.CNode) []List {
+	list := make([]List, 0, 100)
 	var step = startAt
 	var length = linkList.Len()
 
@@ -53,7 +62,10 @@ func DealJosephus(startAt int, linkList *circularLinkedList.CNode) {
 
 	node, _ := linkList.Delete(step)
 
-	fmt.Println("kill:", node.Data.(Data).ID, ";code:", node.Data.(Data).Code)
+	list = append(list, List{
+		Kill: node.Data.(Data).ID,
+		Code: node.Data.(Data).Code,
+	})
 	//linkList.Print()
 	//node.Next.Print()
 	length--
@@ -65,10 +77,14 @@ func DealJosephus(startAt int, linkList *circularLinkedList.CNode) {
 		//node.Next.Print()
 		//fmt.Println(node.Next.Len())
 		//fmt.Println("###################")
-		fmt.Println("kill:", node.Data.(Data).ID, ";code:", node.Data.(Data).Code)
+		list = append(list, List{
+			Kill: node.Data.(Data).ID,
+			Code: node.Data.(Data).Code,
+		})
 	}
 
 	//node.Next.Print()
 	//data := node.Next.Next.Data
 	//fmt.Println("alive:", data.(Data).ID, ";code:", data.(Data).Code)
+	return list
 }
