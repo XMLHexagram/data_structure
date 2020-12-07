@@ -7,8 +7,8 @@ import (
 
 func TestQueue(t *testing.T) {
 	q := Init(11)
-	if !q.isEmpty() {
-		t.Errorf("init wrong on isEmpty")
+	if !q.IsEmpty() {
+		t.Errorf("init wrong on IsEmpty")
 	}
 	if q.Len() != 0 {
 		t.Errorf("init wrong on length")

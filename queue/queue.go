@@ -13,7 +13,7 @@ type ADT interface {
 	Put(data interface{}) error
 	Poll() (interface{}, error)
 	Len() int
-	isEmpty() bool
+	IsEmpty() bool
 	GetHead() interface{}
 	GetAll() []interface{}
 }
@@ -49,7 +49,7 @@ func (q *Queue) Put(data interface{}) error {
 }
 
 func (q *Queue) Poll() (interface{}, error) {
-	if q.isEmpty() {
+	if q.IsEmpty() {
 		return nil, ErrorQueueIsEmpty
 	}
 
@@ -64,7 +64,7 @@ func (q *Queue) Len() int {
 	return ((q.Rear - q.Front) + q.MAX) % q.MAX
 }
 
-func (q *Queue) isEmpty() bool {
+func (q *Queue) IsEmpty() bool {
 	return q.Front == q.Rear
 }
 
