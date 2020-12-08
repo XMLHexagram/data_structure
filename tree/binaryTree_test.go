@@ -1,27 +1,16 @@
 package tree
 
 import (
-	"fmt"
 	"testing"
 )
 
 func TestBinaryTree(t *testing.T) {
-	tree := Init()
-	tree.Data = 1
-	tree.InsertChild(Left, &BiNode{
-		Data:       2,
-		LeftChild:  nil,
-		RightChild: nil,
-		Parent:     nil,
-	})
-	tree.InsertChild(Right,&BiNode{
-		Data:       3,
-		LeftChild:  nil,
-		RightChild: nil,
-		Parent:     nil,
-	})
+	test := []int{1,2,3,4,5,6,7}
+	test1 := make([]interface{},0,100)
 
-	fmt.Println(tree.LayerScan())
+	for _, v := range test {
+		test1 = append(test1,v)
+	}
+	tree := Create(test1)
 	tree.Print()
-	fmt.Println(tree.Depth())
 }

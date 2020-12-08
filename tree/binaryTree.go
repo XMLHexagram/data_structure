@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/lmx-Hexagram/data_structure/queue"
+	"math"
 )
 
 const (
@@ -21,6 +22,10 @@ type ADT interface {
 	Depth() int
 	Point(data interface{}) (*BiNode, error)
 	InsertChild(LR int, node *BiNode)
+	InsertData(LR int, Data interface{})
+	DeleteChild(LR int, node *BiNode)
+	LayerScan() [][]*BiNode
+	Print()
 }
 
 type BiNode struct {
@@ -41,12 +46,35 @@ func Init() *BiNode {
 	return biNode
 }
 
-func Create(stmt string) *BiNode {
-	return nil
+func Create(datas []interface{}) *BiNode {
+	T := Init()
+	q := queue.Init(301)
+	_ = q.Put(T)
+
+	depth := int(math.Floor(math.Sqrt(float64(len(datas))))) + 1
+
+	k := 0
+	for i := 0; i < depth; i++ {
+		length := q.Len()
+		for j := 0; j < length; j++ {
+			nodeInterface, _ := q.Poll()
+			node := nodeInterface.(*BiNode)
+			node.Data = datas[k]
+			k++
+			if i+1 != depth {
+				node.LeftChild = new(BiNode)
+				_ = q.Put(node.LeftChild)
+
+				node.RightChild = new(BiNode)
+				_ = q.Put(node.RightChild)
+			}
+		}
+	}
+	return T
 }
 
 func (T *BiNode) IsEmpty() bool {
-	if T.Data == nil || T.LeftChild == nil || T.RightChild == nil {
+	if T.Data == nil && T.LeftChild == nil && T.RightChild == nil {
 		return true
 	}
 	return false
@@ -57,6 +85,7 @@ func (T *BiNode) Depth() int {
 	if T.IsEmpty() {
 		return 0
 	}
+
 	if T.LeftChild != nil {
 		l = T.LeftChild.Depth()
 	} else {
@@ -74,7 +103,7 @@ func (T *BiNode) Depth() int {
 	} else if r < l {
 		return l + 1
 	} else {
-		return r
+		return r + 1
 	}
 }
 
@@ -84,6 +113,7 @@ func (T *BiNode) Point(data interface{}) (*BiNode, error) {
 	}
 	q := queue.Init(301)
 	_ = q.Put(T)
+
 	for !q.IsEmpty() {
 		temp, _ := q.Poll()
 		node := temp.(*BiNode)
@@ -126,24 +156,56 @@ func (T *BiNode) InsertChild(LR int, node *BiNode) {
 	}
 }
 
+func (T *BiNode) InsertData(LR int, data interface{}) {
+	T.InsertChild(LR, &BiNode{
+		Data:       data,
+		LeftChild:  nil,
+		RightChild: nil,
+		Parent:     nil,
+	})
+}
+
+func (T *BiNode) DeleteChild(LR int) {
+	if LR == Left {
+		T.LeftChild = nil
+	} else {
+		T.RightChild = nil
+	}
+}
+
 func (T *BiNode) LayerScan() [][]*BiNode {
 	res := make([][]*BiNode, 0, 100)
 	list := make([]*BiNode, 0, 100)
 	q := queue.Init(301)
 
+	depth := T.Depth()
+
 	_ = q.Put(T)
-	for !q.IsEmpty() {
+	for i := 0; i < depth; i++ {
 		count := q.Len()
 		for i := 0; i < count; i++ {
 			nodeInterface, _ := q.Poll()
+			//fmt.Println(nodeInterface)
+			//if reflect.ValueOf(nodeInterface)== nil {
+			//	fmt.Println("###")
+			//
+			//}
+			//fmt.Println(nodeInterface)
 			node := nodeInterface.(*BiNode)
+			if node == nil {
+				//fmt.Println("success")
+				list = append(list, nil)
+				_ = q.Put(node)
+				_ = q.Put(node)
+				continue
+			}
 			list = append(list, node)
-			if node.LeftChild != nil {
-				_ = q.Put(node.LeftChild)
-			}
-			if node.RightChild != nil {
-				_ = q.Put(node.RightChild)
-			}
+			//if node.LeftChild != nil {
+			_ = q.Put(node.LeftChild)
+			//}
+			//if node.RightChild != nil {
+			_ = q.Put(node.RightChild)
+			//}
 		}
 		res = append(res, list)
 		list = make([]*BiNode, 0, 100)
@@ -155,7 +217,12 @@ func (T *BiNode) LayerScan() [][]*BiNode {
 func (T *BiNode) Print() {
 	for _, nodes := range T.LayerScan() {
 		for _, node := range nodes {
-			fmt.Print(node.Data," ")
+			if node != nil {
+				fmt.Print(node.Data, " ")
+			} else {
+				fmt.Print("nil", " ")
+			}
+
 		}
 		fmt.Println()
 	}
