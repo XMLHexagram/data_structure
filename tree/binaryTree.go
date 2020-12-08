@@ -13,6 +13,7 @@ const (
 )
 
 var (
+	ErrArrayLength         = errors.New("array length err")
 	ErrorBinaryTreeIsEmpty = errors.New("binary tree is empty")
 	ErrorNotFound          = errors.New("not found")
 )
@@ -23,7 +24,7 @@ type ADT interface {
 	Point(data interface{}) (*BiNode, error)
 	InsertChild(LR int, node *BiNode)
 	InsertData(LR int, Data interface{})
-	DeleteChild(LR int, node *BiNode)
+	DeleteChild(LR int)
 	LayerScan() [][]*BiNode
 	Print()
 }
@@ -46,12 +47,16 @@ func Init() *BiNode {
 	return biNode
 }
 
-func Create(datas []interface{}) *BiNode {
+func Create(datas []interface{}) (*BiNode, error) {
 	T := Init()
 	q := queue.Init(301)
 	_ = q.Put(T)
 
 	depth := int(math.Floor(math.Sqrt(float64(len(datas))))) + 1
+
+	if int(math.Pow(2, float64(depth)))-1 != len(datas) {
+		return nil, ErrArrayLength
+	}
 
 	k := 0
 	for i := 0; i < depth; i++ {
@@ -70,7 +75,7 @@ func Create(datas []interface{}) *BiNode {
 			}
 		}
 	}
-	return T
+	return T, nil
 }
 
 func (T *BiNode) IsEmpty() bool {
@@ -165,6 +170,7 @@ func (T *BiNode) InsertData(LR int, data interface{}) {
 	})
 }
 
+//todo: need to be improve :return the deleted node and err
 func (T *BiNode) DeleteChild(LR int) {
 	if LR == Left {
 		T.LeftChild = nil
@@ -215,10 +221,12 @@ func (T *BiNode) LayerScan() [][]*BiNode {
 }
 
 func (T *BiNode) Print() {
-	for _, nodes := range T.LayerScan() {
-		for _, node := range nodes {
-			if node != nil {
-				fmt.Print(node.Data, " ")
+	DatasArray := ToDataArray(T.LayerScan())
+
+	for _, datas := range DatasArray {
+		for _, data := range datas {
+			if data != nil {
+				fmt.Print(data, " ")
 			} else {
 				fmt.Print("nil", " ")
 			}
@@ -226,4 +234,21 @@ func (T *BiNode) Print() {
 		}
 		fmt.Println()
 	}
+}
+
+func ToDataArray(BiArray [][]*BiNode) (DatasArray [][]interface{}) {
+	res := make([][]interface{}, 0, 100)
+	raw := make([]interface{}, 0, 100)
+	for _, nodes := range BiArray {
+		for _, node := range nodes {
+			if node == nil {
+				raw = append(raw, nil)
+				continue
+			}
+			raw = append(raw, node.Data)
+		}
+		res = append(res, raw)
+		raw = make([]interface{}, 0, 100)
+	}
+	return res
 }
