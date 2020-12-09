@@ -56,6 +56,38 @@ func (m *Matrix) Transpose() *Matrix {
 	return r
 }
 
+func (m *Matrix) QuickTranspose() *Matrix {
+	r := &Matrix{
+		Points: make([]Point, m.Count),
+		Row:    m.Col,
+		Col:    m.Row,
+		Count:  m.Count,
+	}
+
+	// 每一列有几个
+	nums := make([]int, m.Col)
+	// 每一列的第一个 在转换之后应该在的位置
+	cpot := make([]int, m.Col)
+	for _, point := range m.Points {
+		nums[point.J-1]++
+	}
+	cpot[0] = 1
+	for i := 1; i < len(cpot); i++ {
+		cpot[i] = cpot[i-1] + nums[i-1]
+	}
+
+	for _, point := range m.Points {
+		r.Points[cpot[point.J-1]-1] = Point{
+			I:    point.J,
+			J:    point.I,
+			Data: point.Data,
+		}
+		cpot[point.J-1]++
+	}
+
+	return r
+}
+
 func (m *Matrix) Print() {
 	fmt.Println(m.Points)
 
