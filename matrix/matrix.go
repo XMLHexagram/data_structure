@@ -7,6 +7,7 @@ import (
 
 var (
 	ErrInvalidMatrixOnMultiply = errors.New("invalid matrix on multiply")
+	ErrInvalidMatrixOnPlus     = errors.New("invalid matrix on plus")
 )
 
 type ADT interface {
@@ -15,6 +16,7 @@ type ADT interface {
 	Normalize() [][]interface{}
 	NormalizePrint()
 	Print()
+	Multiply(N *Matrix) (res *Matrix, err error)
 }
 
 type Matrix struct {
@@ -115,10 +117,10 @@ func (m *Matrix) Print() {
 	fmt.Println()
 }
 
-func (m *Matrix) Normalize() [][]interface{} {
-	res := make([][]interface{}, m.Row)
+func (m *Matrix) Normalize() [][]int {
+	res := make([][]int, m.Row)
 	for i := 0; i < len(res); i++ {
-		res[i] = make([]interface{}, m.Col)
+		res[i] = make([]int, m.Col)
 	}
 
 	for _, v := range m.Points {
@@ -162,7 +164,7 @@ func (M *Matrix) Multiply(N *Matrix) (res *Matrix, err error) {
 			for m := 0; m < M.Count; m++ {
 				for n := 0; n < N.Count; n++ {
 					if M.Points[m].I-1 == i && N.Points[n].J-1 == j && M.Points[m].J == N.Points[n].I {
-						fmt.Println(M.Points[m], " ", N.Points[n])
+						//fmt.Println(M.Points[m], " ", N.Points[n])
 						temp = temp + M.Points[m].Data*N.Points[n].Data
 						//fmt.Println(temp)
 					}
@@ -171,13 +173,66 @@ func (M *Matrix) Multiply(N *Matrix) (res *Matrix, err error) {
 			}
 			if temp != 0 {
 				res.Points = append(res.Points, Point{
-					I:    i+1,
-					J:    j+1,
+					I:    i + 1,
+					J:    j + 1,
 					Data: temp,
 				})
 			}
 		}
 	}
-	fmt.Println(res.Points)
+	//fmt.Println(res.Points)
+	return res, nil
+}
+
+func (M *Matrix) Plus(N *Matrix) (res *Matrix, err error) {
+	if M.Col != N.Col || M.Row != N.Row {
+		return nil, ErrInvalidMatrixOnPlus
+	}
+
+	res = &Matrix{
+		Points: make([]Point, 0, 100),
+		Row:    M.Row,
+		Col:    M.Col,
+		Count:  0,
+	}
+
+	//for i := 0; i < M.Row; i++ {
+	//	for j := 0; j < M.Col; j++ {
+	//
+	//	}
+	//}
+	for _, mPoint := range M.Points {
+		for _, nPoint := range N.Points {
+			if mPoint.I == nPoint.I && mPoint.J == nPoint.J {
+				mPoint.Data = mPoint.Data + nPoint.Data
+				break
+			}
+		}
+		res.Points = append(res.Points, mPoint)
+	}
+	return res, nil
+}
+
+func (M *Matrix) Minus(N *Matrix) (res *Matrix, err error) {
+	if M.Col != N.Col || M.Row != N.Row {
+		return nil, ErrInvalidMatrixOnPlus
+	}
+
+	res = &Matrix{
+		Points: make([]Point, 0, 100),
+		Row:    M.Row,
+		Col:    M.Col,
+		Count:  0,
+	}
+
+	for _, mPoint := range M.Points {
+		for _, nPoint := range N.Points {
+			if mPoint.I == nPoint.I && mPoint.J == nPoint.J {
+				mPoint.Data = mPoint.Data - nPoint.Data
+				break
+			}
+		}
+		res.Points = append(res.Points, mPoint)
+	}
 	return res, nil
 }
