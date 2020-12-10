@@ -2,53 +2,100 @@ package matrix
 
 import "testing"
 
-func TestMatrix(T *testing.T) {
-	//testInput := [][3]int{{1, 1, 3}, {1, 2, 5}, {2, 3, 7}, {2, 5, 11}, {3, 3, 2}, {3, 6, 8}, {5, 5, 9}, {5, 6, 10}}
-	//points := make([]Point, 0, 100)
-	//
-	//for _, ints := range testInput {
-	//	points = append(points, Point{
-	//		I:    ints[0],
-	//		J:    ints[1],
-	//		Data: ints[2],
-	//	})
-	//}
-	//
-	//m := Init(5, 6, points)
-	//m.Print()
-	//m.NormalizePrint()
-	//t := m.QuickTranspose()
-	//t.NormalizePrint()
+func TestMatrix_Multiply(t *testing.T) {
+	testData1 := [][3]int{{1, 1, 3}, {1, 4, 5}, {2, 2, -1}, {3, 1, 2}}
+	m := testDateToMatrix(testData1, 3, 4)
 
-	testInput1 := [][3]int{{1, 1, 3}, {1, 4, 5}, {2, 2, -1}, {3, 1, 2}}
-	points1 := make([]Point, 0, 100)
-
-	for _, ints := range testInput1 {
-		points1 = append(points1, Point{
-			I:    ints[0],
-			J:    ints[1],
-			Data: ints[2],
-		})
-	}
-	m := Init(3, 4, points1)
-	m.Print()
-
-	testInput2 := [][3]int{{1, 2, 2}, {2, 1, 1}, {3, 1, -2}, {3, 2, -4}}
-	points2 := make([]Point, 0, 100)
-
-	for _, ints := range testInput2 {
-		points2 = append(points2, Point{
-			I:    ints[0],
-			J:    ints[1],
-			Data: ints[2],
-		})
-	}
-	n := Init(4, 2, points2)
-	n.Print()
+	testData2 := [][3]int{{1, 2, 2}, {2, 1, 1}, {3, 1, -2}, {3, 2, -4}}
+	n := testDateToMatrix(testData2, 4, 2)
 
 	r, err := m.Multiply(n)
 	if err != nil {
-		T.Error(err)
+		t.Error(err)
 	}
-	r.Print()
+
+	answer := [][]int{{0, 6}, {-1, 0}, {0, 4}}
+	checkAnswer(r.Normalize(), answer, t)
+	//todo:再测试一组数据
+}
+
+func TestMatrix_Transpose(t *testing.T) {
+	testData1 := [][3]int{{1, 2, 3}, {1, 4, 5}, {2, 2, -1}, {3, 1, 2}}
+	m := testDateToMatrix(testData1, 3, 4)
+
+	r := m.Transpose()
+	answer := [][]int{{0, 0, 2}, {3, -1, 0}, {0, 0, 0}, {5, 0, 0}}
+	checkAnswer(r.Normalize(), answer, t)
+}
+
+func TestMatrix_QuickTranspose(t *testing.T) {
+	testData1 := [][3]int{{1, 2, 3}, {1, 4, 5}, {2, 2, -1}, {3, 1, 2}}
+	m := testDateToMatrix(testData1, 3, 4)
+
+	r := m.QuickTranspose()
+	answer := [][]int{{0, 0, 2}, {3, -1, 0}, {0, 0, 0}, {5, 0, 0}}
+	checkAnswer(r.Normalize(), answer, t)
+}
+
+func TestMatrix_Normalize(t *testing.T) {
+	testData1 := [][3]int{{1, 2, 3}, {1, 4, 5}, {2, 2, -1}, {3, 1, 2}}
+	m := testDateToMatrix(testData1, 3, 4)
+
+	r := m.Normalize()
+	answer := [][]int{{0, 3, 0, 5}, {0, -1, 0, 0}, {2, 0, 0, 0}}
+	checkAnswer(r, answer, t)
+}
+
+func TestMatrix_Plus(t *testing.T) {
+	testData1 := [][3]int{{1, 1, 10}, {2, 3, 9}, {3, 1, -1}}
+	testData2 := [][3]int{{2, 3, -1}, {3, 1, 1}, {3, 3, -3}}
+	m := testDateToMatrix(testData1, 3, 3)
+	n := testDateToMatrix(testData2, 3, 3)
+	r, err := m.Plus(n)
+	if err != nil {
+		t.Error(err)
+	}
+	m.Print()
+	n.Print()
+r.Print()
+	answer := [][]int{{10, 0, 0}, {0, 0, 8}, {0, 0, -3}}
+	checkAnswer(r.Normalize(), answer, t)
+}
+
+func TestMatrix_Minus(t *testing.T) {
+	testData1 := [][3]int{{1, 1, 10}, {2, 2, 9}, {3, 1, -1}}
+	testData2 := [][3]int{{2, 3, -1}, {3, 1, 1}, {3, 2, -3}}
+	m := testDateToMatrix(testData1, 3, 2)
+	n := testDateToMatrix(testData2, 3, 2)
+	r, err := m.Minus(n)
+	if err != nil {
+		t.Error(err)
+	}
+
+	answer := [][]int{{10, 0}, {0, 10}, {-2, -3}}
+	checkAnswer(r.Normalize(), answer, t)
+}
+
+func testDateToMatrix(testData [][3]int, row int, col int) *Matrix {
+	points := make([]Point, 0, 100)
+
+	for _, ints := range testData {
+		points = append(points, Point{
+			I:    ints[0],
+			J:    ints[1],
+			Data: ints[2],
+		})
+	}
+	m := Init(row, col, points)
+	return m
+}
+
+func checkAnswer(res [][]int, answer [][]int, t *testing.T) {
+	for i, raw := range res {
+		for j, point := range raw {
+			if answer[i][j] != point {
+				t.Errorf("wrong result point:expect %d but get %d", answer[i][j], point)
+			}
+		}
+	}
 }

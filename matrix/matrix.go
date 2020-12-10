@@ -8,15 +8,18 @@ import (
 var (
 	ErrInvalidMatrixOnMultiply = errors.New("invalid matrix on multiply")
 	ErrInvalidMatrixOnPlus     = errors.New("invalid matrix on plus")
+	ErrInvalidMatrixOnMinus    = errors.New("invalid matrix on minus")
 )
 
 type ADT interface {
 	Transpose() *Matrix
 	QuickTranspose() *Matrix
-	Normalize() [][]interface{}
-	NormalizePrint()
-	Print()
+	Normalize() [][]int
+	NormalizePrint() //
+	Print()          //
 	Multiply(N *Matrix) (res *Matrix, err error)
+	Plus(N *Matrix) (res *Matrix, err error)
+	Minus(N *Matrix) (res *Matrix, err error)
 }
 
 type Matrix struct {
@@ -42,22 +45,22 @@ func Init(row int, col int, points []Point) *Matrix {
 	return m
 }
 
-func (m *Matrix) Transpose() *Matrix {
+func (M *Matrix) Transpose() *Matrix {
 	r := &Matrix{
 		Points: make([]Point, 0, 100),
-		Row:    m.Col,
-		Col:    m.Row,
-		Count:  m.Count,
+		Row:    M.Col,
+		Col:    M.Row,
+		Count:  M.Count,
 	}
 
-	for col := 1; col <= m.Col; col++ {
+	for col := 1; col <= M.Col; col++ {
 		//fmt.Println(m.Count, "##")
-		for count := 0; count < m.Count; count++ {
-			if m.Points[count].J == col {
+		for count := 0; count < M.Count; count++ {
+			if M.Points[count].J == col {
 				r.Points = append(r.Points, Point{
-					I:    m.Points[count].J,
-					J:    m.Points[count].I,
-					Data: m.Points[count].Data,
+					I:    M.Points[count].J,
+					J:    M.Points[count].I,
+					Data: M.Points[count].Data,
 				})
 			}
 		}
@@ -66,20 +69,20 @@ func (m *Matrix) Transpose() *Matrix {
 	return r
 }
 
-func (m *Matrix) QuickTranspose() *Matrix {
+func (M *Matrix) QuickTranspose() *Matrix {
 	r := &Matrix{
-		Points: make([]Point, m.Count),
-		Row:    m.Col,
-		Col:    m.Row,
-		Count:  m.Count,
+		Points: make([]Point, M.Count),
+		Row:    M.Col,
+		Col:    M.Row,
+		Count:  M.Count,
 	}
 
 	// 每一列有几个
-	nums := make([]int, m.Col)
+	nums := make([]int, M.Col)
 	// 每一列的第一个 在转换之后应该在的位置
 	// 每一列第一个非零元所在的位置
-	colPos := make([]int, m.Col)
-	for _, point := range m.Points {
+	colPos := make([]int, M.Col)
+	for _, point := range M.Points {
 		nums[point.J-1]++
 	}
 	colPos[0] = 1
@@ -87,7 +90,7 @@ func (m *Matrix) QuickTranspose() *Matrix {
 		colPos[i] = colPos[i-1] + nums[i-1]
 	}
 
-	for _, point := range m.Points {
+	for _, point := range M.Points {
 		r.Points[colPos[point.J-1]-1] = Point{
 			I:    point.J,
 			J:    point.I,
@@ -99,14 +102,14 @@ func (m *Matrix) QuickTranspose() *Matrix {
 	return r
 }
 
-func (m *Matrix) Print() {
+func (M *Matrix) Print() {
 	//fmt.Println(m.Points)
 
 	count := 0
-	for i := 1; i <= m.Row; i++ {
-		for j := 1; j <= m.Col; j++ {
-			if count < len(m.Points) && m.Points[count].I == i && m.Points[count].J == j {
-				fmt.Print(m.Points[count].Data, " ")
+	for i := 1; i <= M.Row; i++ {
+		for j := 1; j <= M.Col; j++ {
+			if count < len(M.Points) && M.Points[count].I == i && M.Points[count].J == j {
+				fmt.Print(M.Points[count].Data, " ")
 				count++
 			} else {
 				fmt.Print("0", " ")
@@ -117,24 +120,24 @@ func (m *Matrix) Print() {
 	fmt.Println()
 }
 
-func (m *Matrix) Normalize() [][]int {
-	res := make([][]int, m.Row)
+func (M *Matrix) Normalize() [][]int {
+	res := make([][]int, M.Row)
 	for i := 0; i < len(res); i++ {
-		res[i] = make([]int, m.Col)
+		res[i] = make([]int, M.Col)
 	}
 
-	for _, v := range m.Points {
+	for _, v := range M.Points {
 		res[v.I-1][v.J-1] = v.Data
 	}
 
 	return res
 }
 
-func (m *Matrix) NormalizePrint() {
-	matrix := m.Normalize()
+func (M *Matrix) NormalizePrint() {
+	matrix := M.Normalize()
 	for _, raw := range matrix {
 		for _, point := range raw {
-			if point != nil {
+			if point != 0 {
 				fmt.Print(point, " ")
 				continue
 			}
@@ -208,14 +211,17 @@ func (M *Matrix) Plus(N *Matrix) (res *Matrix, err error) {
 				break
 			}
 		}
-		res.Points = append(res.Points, mPoint)
+		if mPoint.Data != 0 {
+			fmt.Println(mPoint.Data)
+			res.Points = append(res.Points, mPoint)
+		}
 	}
 	return res, nil
 }
 
 func (M *Matrix) Minus(N *Matrix) (res *Matrix, err error) {
 	if M.Col != N.Col || M.Row != N.Row {
-		return nil, ErrInvalidMatrixOnPlus
+		return nil, ErrInvalidMatrixOnMinus
 	}
 
 	res = &Matrix{
@@ -232,7 +238,9 @@ func (M *Matrix) Minus(N *Matrix) (res *Matrix, err error) {
 				break
 			}
 		}
-		res.Points = append(res.Points, mPoint)
+		if mPoint.Data != 0 {
+			res.Points = append(res.Points, mPoint)
+		}
 	}
 	return res, nil
 }
