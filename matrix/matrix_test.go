@@ -4,19 +4,28 @@ import "testing"
 
 func TestMatrix_Multiply(t *testing.T) {
 	testData1 := [][3]int{{1, 1, 3}, {1, 4, 5}, {2, 2, -1}, {3, 1, 2}}
-	m := testDateToMatrix(testData1, 3, 4)
-
 	testData2 := [][3]int{{1, 2, 2}, {2, 1, 1}, {3, 1, -2}, {3, 2, -4}}
+	answer1 := [][]int{{0, 6}, {-1, 0}, {0, 4}}
+
+	m := testDateToMatrix(testData1, 3, 4)
 	n := testDateToMatrix(testData2, 4, 2)
 
 	r, err := m.Multiply(n)
 	if err != nil {
 		t.Error(err)
 	}
+	checkAnswer(r.Normalize(), answer1, t)
 
-	answer := [][]int{{0, 6}, {-1, 0}, {0, 4}}
-	checkAnswer(r.Normalize(), answer, t)
-	//todo:再测试一组数据
+	testData1 = [][3]int{{1, 1, 4}, {1, 2, -3}, {1, 5, 1}, {2, 4, 8}, {3, 3, 1}, {4, 5, 70}}
+	testData2 = [][3]int{{1, 1, 3}, {2, 1, -4}, {2, 2, 2}, {3, 2, 1}, {4, 1, 1}}
+	answer2 := [][]int{{24, -6, 0}, {8, 0, 0}, {0, 1, 0}, {0, 0, 0}}
+	m = testDateToMatrix(testData1, 4, 5)
+	n = testDateToMatrix(testData2, 5, 3)
+	r, err = m.Multiply(n)
+	if err != nil {
+		t.Error(err)
+	}
+	checkAnswer(r.Normalize(), answer2, t)
 }
 
 func TestMatrix_Transpose(t *testing.T) {
@@ -55,24 +64,26 @@ func TestMatrix_Plus(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	m.Print()
-	n.Print()
-r.Print()
+	//m.Print()
+	//n.Print()
+	//r.Print()
 	answer := [][]int{{10, 0, 0}, {0, 0, 8}, {0, 0, -3}}
 	checkAnswer(r.Normalize(), answer, t)
 }
 
 func TestMatrix_Minus(t *testing.T) {
 	testData1 := [][3]int{{1, 1, 10}, {2, 2, 9}, {3, 1, -1}}
-	testData2 := [][3]int{{2, 3, -1}, {3, 1, 1}, {3, 2, -3}}
+	testData2 := [][3]int{{2, 2, -1}, {3, 1, 1}, {3, 2, -3}}
 	m := testDateToMatrix(testData1, 3, 2)
 	n := testDateToMatrix(testData2, 3, 2)
 	r, err := m.Minus(n)
 	if err != nil {
 		t.Error(err)
 	}
-
-	answer := [][]int{{10, 0}, {0, 10}, {-2, -3}}
+	//m.Print()
+	//n.Print()
+	//r.Print()
+	answer := [][]int{{10, 0}, {0, 10}, {-2, 3}}
 	checkAnswer(r.Normalize(), answer, t)
 }
 

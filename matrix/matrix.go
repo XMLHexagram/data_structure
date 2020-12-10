@@ -187,10 +187,32 @@ func (M *Matrix) Multiply(N *Matrix) (res *Matrix, err error) {
 	return res, nil
 }
 
-func (M *Matrix) Plus(N *Matrix) (res *Matrix, err error) {
+func (M Matrix) Plus(N *Matrix) (res *Matrix, err error) {
 	if M.Col != N.Col || M.Row != N.Row {
 		return nil, ErrInvalidMatrixOnPlus
 	}
+
+	//var mNum []int = make([]int, M.Row)
+	//for _, v := range M.Points {
+	//	mNum[v.I-1]++
+	//}
+	//
+	//var mRowPos []int = make([]int, M.Row)
+	//mRowPos[0] = 1
+	//for i := 1; i < len(mRowPos); i++ {
+	//	mRowPos[i] = mRowPos[i-1] + mNum[i-1]
+	//}
+	//
+	//var nNum []int = make([]int, N.Row)
+	//for _, v := range M.Points {
+	//	nNum[v.I-1]++
+	//}
+	//
+	//var nRowPos []int = make([]int, N.Row)
+	//nRowPos[0] = 1
+	//for i := 1; i < len(nRowPos); i++ {
+	//	nRowPos[i] = nRowPos[i-1] + nNum[i-1]
+	//}
 
 	res = &Matrix{
 		Points: make([]Point, 0, 100),
@@ -204,18 +226,80 @@ func (M *Matrix) Plus(N *Matrix) (res *Matrix, err error) {
 	//
 	//	}
 	//}
-	for _, mPoint := range M.Points {
-		for _, nPoint := range N.Points {
-			if mPoint.I == nPoint.I && mPoint.J == nPoint.J {
-				mPoint.Data = mPoint.Data + nPoint.Data
-				break
+
+	//for i := 0; i < M.Row; i++ {
+	//	for j := 0; j < M.Col; j++ {
+	//		if  {
+	//
+	//		}
+	//	}
+	//}
+
+	mCount := 0
+	nCount := 0
+	for {
+		if M.Points[mCount].I == N.Points[nCount].I {
+
+			if M.Points[mCount].J == N.Points[nCount].J {
+				res.Points = append(res.Points, Point{
+					I:    M.Points[mCount].I,
+					J:    M.Points[mCount].J,
+					Data: M.Points[mCount].Data + N.Points[nCount].Data,
+				})
+				mCount++
+				nCount++
+			} else if M.Points[mCount].J < N.Points[nCount].J {
+				res.Points = append(res.Points, Point{
+					I:    M.Points[mCount].I,
+					J:    M.Points[mCount].J,
+					Data: M.Points[mCount].Data,
+				})
+				mCount++
+			} else if M.Points[mCount].J > N.Points[nCount].J {
+				res.Points = append(res.Points, Point{
+					I:    N.Points[mCount].I,
+					J:    N.Points[mCount].J,
+					Data: N.Points[mCount].Data,
+				})
+				nCount++
 			}
+		} else if M.Points[mCount].I < N.Points[nCount].I {
+			res.Points = append(res.Points, Point{
+				I:    M.Points[mCount].I,
+				J:    M.Points[mCount].J,
+				Data: M.Points[mCount].Data,
+			})
+			mCount++
+		} else if M.Points[mCount].I > N.Points[nCount].I {
+			res.Points = append(res.Points, Point{
+				I:    N.Points[mCount].I,
+				J:    N.Points[mCount].J,
+				Data: N.Points[mCount].Data,
+			})
+			nCount++
 		}
-		if mPoint.Data != 0 {
-			fmt.Println(mPoint.Data)
-			res.Points = append(res.Points, mPoint)
+		if mCount == len(M.Points) {
+			res.Points = append(res.Points, N.Points[nCount:]...)
+			break
+		}
+		if nCount == len(N.Points) {
+			res.Points = append(res.Points, M.Points[nCount:]...)
+			break
 		}
 	}
+
+	//for _, mPoint := range M.Points {
+	//	for _, nPoint := range N.Points {
+	//		if mPoint.I == nPoint.I && mPoint.J == nPoint.J {
+	//			mPoint.Data = mPoint.Data + nPoint.Data
+	//			break
+	//		}
+	//	}
+	//	if mPoint.Data != 0 {
+	//		fmt.Println(mPoint.Data)
+	//		res.Points = append(res.Points, mPoint)
+	//	}
+	//}
 	return res, nil
 }
 
@@ -231,16 +315,69 @@ func (M *Matrix) Minus(N *Matrix) (res *Matrix, err error) {
 		Count:  0,
 	}
 
-	for _, mPoint := range M.Points {
-		for _, nPoint := range N.Points {
-			if mPoint.I == nPoint.I && mPoint.J == nPoint.J {
-				mPoint.Data = mPoint.Data - nPoint.Data
-				break
+	mCount := 0
+	nCount := 0
+	for {
+		if M.Points[mCount].I == N.Points[nCount].I {
+
+			if M.Points[mCount].J == N.Points[nCount].J {
+				res.Points = append(res.Points, Point{
+					I:    M.Points[mCount].I,
+					J:    M.Points[mCount].J,
+					Data: M.Points[mCount].Data - N.Points[nCount].Data,
+				})
+				mCount++
+				nCount++
+			} else if M.Points[mCount].J < N.Points[nCount].J {
+				res.Points = append(res.Points, Point{
+					I:    M.Points[mCount].I,
+					J:    M.Points[mCount].J,
+					Data: M.Points[mCount].Data,
+				})
+				mCount++
+			} else if M.Points[mCount].J > N.Points[nCount].J {
+				res.Points = append(res.Points, Point{
+					I:    N.Points[mCount].I,
+					J:    N.Points[mCount].J,
+					Data: -N.Points[mCount].Data,
+				})
+				nCount++
 			}
+		} else if M.Points[mCount].I < N.Points[nCount].I {
+			res.Points = append(res.Points, Point{
+				I:    M.Points[mCount].I,
+				J:    M.Points[mCount].J,
+				Data: M.Points[mCount].Data,
+			})
+			mCount++
+		} else if M.Points[mCount].I > N.Points[nCount].I {
+			res.Points = append(res.Points, Point{
+				I:    N.Points[mCount].I,
+				J:    N.Points[mCount].J,
+				Data: -N.Points[mCount].Data,
+			})
+			nCount++
 		}
-		if mPoint.Data != 0 {
-			res.Points = append(res.Points, mPoint)
+		if mCount == len(M.Points) {
+			//res.Points = append(res.Points, N.Points[nCount:]...)
+
+			for _, point := range N.Points[nCount:] {
+				res.Points = append(res.Points, Point{
+					I:    point.I,
+					J:    point.J,
+					Data: -point.Data,
+				})
+			}
+			break
+		}
+		if nCount == len(N.Points) {
+			res.Points = append(res.Points, M.Points[nCount:]...)
+			break
 		}
 	}
 	return res, nil
 }
+
+//func (M *Matrix)GetRowPos()  {
+//
+//}
