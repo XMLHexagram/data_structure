@@ -33,5 +33,8 @@ func TestMGraph(t *testing.T) {
 		fmt.Print(vertex.data, " ")
 	}
 	g.DFSTraverse(visit)
+	fmt.Println()
+	g.BFSTraverse(visit)
+	fmt.Println()
 	g.Print()
 }

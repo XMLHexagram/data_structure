@@ -3,6 +3,7 @@ package graph
 import (
 	"errors"
 	"fmt"
+	"github.com/lmx-Hexagram/data_structure/queue"
 )
 
 type ADT interface {
@@ -154,6 +155,29 @@ func (g *MGraph) DFS(index int, visit func(vertex Vertex), visited *[]bool) {
 	for w, _ := g.FirstAdjVertex(index); w >= 0; w, _ = g.NextAdjVertex(index, w) {
 		if !(*visited)[w] {
 			g.DFS(w, visit, visited)
+		}
+	}
+}
+
+func (g *MGraph) BFSTraverse(visit func(vertex Vertex)) {
+	var visited []bool = make([]bool, g.VertexNumber)
+	q := queue.Init(301)
+	for i := 0; i < g.VertexNumber; i++ {
+		if !visited[i] {
+			visited[i] = true
+			visit(g.Vertexes[i])
+			q.Put(i)
+			for !q.IsEmpty() {
+				interfaceData, _ := q.Poll()
+				index := interfaceData.(int)
+				for w, _ := g.FirstAdjVertex(index); w >= 0; w, _ = g.NextAdjVertex(index, w) {
+					if !visited[w] {
+						visited[w] = true
+						visit(g.Vertexes[w])
+						q.Put(w)
+					}
+				}
+			}
 		}
 	}
 }
