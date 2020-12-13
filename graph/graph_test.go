@@ -1,40 +1,34 @@
 package graph
 
 import (
-	"fmt"
 	"testing"
 )
 
 func TestMGraph(t *testing.T) {
-	g := New(8)
+	g := New(6)
 	g.AddVertex("1")
 	g.AddVertex("2")
 	g.AddVertex("3")
 	g.AddVertex("4")
 	g.AddVertex("5")
 	g.AddVertex("6")
-	g.AddVertex("7")
-	g.AddVertex("8")
 
-	g.AddArcBothByVertexData("1", "2")
-	g.AddArcBothByVertexData("1", "3")
-	g.AddArcBothByVertexData("2", "4")
-	g.AddArcBothByVertexData("2", "5")
-	g.AddArcBothByVertexData("4", "8")
-	g.AddArcBothByVertexData("5", "8")
-	g.AddArcBothByVertexData("3", "7")
-	g.AddArcBothByVertexData("3", "6")
-	g.AddArcBothByVertexData("6", "7")
+	g.AddArcByVertexData("1","2",1)
+	g.AddArcByVertexData("1","3",12)
+	g.AddArcByVertexData("2","3",9)
+	g.AddArcByVertexData("2","4",3)
+	g.AddArcByVertexData("4","3",4)
+	g.AddArcByVertexData("3","5",5)
+	g.AddArcByVertexData("4","5",13)
+	g.AddArcByVertexData("4","6",15)
+	g.AddArcByVertexData("5","6",4)
+	g.AddArcByVertexData("1","1",0)
+	g.AddArcByVertexData("2","2",0)
+	g.AddArcByVertexData("3","3",0)
+	g.AddArcByVertexData("4","4",0)
+	g.AddArcByVertexData("5","5",0)
+	g.AddArcByVertexData("6","6",0)
 
-	//index, _ := g.LocateVertexByData("a")
-	//fmt.Println(g.FirstAdjVertex(index))
-	//fmt.Println(g.NextAdjVertex(index, 3))
-	visit := func(vertex Vertex) {
-		fmt.Print(vertex.data, " ")
-	}
-	g.DFSTraverse(visit)
-	fmt.Println()
-	g.BFSTraverse(visit)
-	fmt.Println()
 	g.Print()
+	g.Dijkstra()
 }

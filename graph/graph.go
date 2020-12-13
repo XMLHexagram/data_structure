@@ -29,7 +29,7 @@ const (
 )
 
 type Arc struct {
-	VRType int
+	Data interface{}
 	//Data   interface{}
 }
 
@@ -75,25 +75,25 @@ func (g *MGraph) AddVertex(data interface{}) (err error) {
 	return nil
 }
 
-func (g *MGraph) AddArcByIndex(fromIndex int, toIndex int) (err error) {
-	g.ArcMatrix[fromIndex][toIndex] = Arc{VRType: 1}
+func (g *MGraph) AddArcByIndex(fromIndex int, toIndex int, data interface{}) (err error) {
+	g.ArcMatrix[fromIndex][toIndex] = Arc{Data: data}
 	g.ArcNumber++
 	return nil
 }
 
-func (g *MGraph) AddArcBothByVertexData(fromData interface{}, toData interface{}) (err error) {
-	err = g.AddArcByVertexData(fromData, toData)
-	if err != nil {
-		return err
-	}
-	err = g.AddArcByVertexData(toData, fromData)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+//func (g *MGraph) AddArcBothByVertexData(fromData interface{}, toData interface{}) (err error) {
+//	err = g.AddArcByVertexData(fromData, toData)
+//	if err != nil {
+//		return err
+//	}
+//	err = g.AddArcByVertexData(toData, fromData)
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}
 
-func (g *MGraph) AddArcByVertexData(fromData interface{}, toData interface{}) (err error) {
+func (g *MGraph) AddArcByVertexData(fromData interface{}, toData interface{}, data interface{}) (err error) {
 	fromIndex, err := g.LocateVertexByData(fromData)
 	if err != nil {
 		return err
@@ -102,7 +102,7 @@ func (g *MGraph) AddArcByVertexData(fromData interface{}, toData interface{}) (e
 	if err != nil {
 		return err
 	}
-	err = g.AddArcByIndex(fromIndex, toIndex)
+	err = g.AddArcByIndex(fromIndex, toIndex, data)
 	if err != nil {
 		return err
 	}
@@ -111,7 +111,7 @@ func (g *MGraph) AddArcByVertexData(fromData interface{}, toData interface{}) (e
 
 func (g *MGraph) FirstAdjVertex(index int) (resIndex int, hasAdj bool) {
 	for i := 0; i < g.VertexNumber; i++ {
-		if g.ArcMatrix[index][i].VRType != 0 {
+		if g.ArcMatrix[index][i].Data != 0 {
 			return i, true
 		}
 	}
@@ -120,7 +120,7 @@ func (g *MGraph) FirstAdjVertex(index int) (resIndex int, hasAdj bool) {
 
 func (g *MGraph) NextAdjVertex(index int, start int) (resIndex int, hasNext bool) {
 	for i := start + 1; i < g.VertexNumber; i++ {
-		if g.ArcMatrix[index][i].VRType != 0 {
+		if g.ArcMatrix[index][i].Data != 0 {
 			return i, true
 		}
 	}
@@ -179,5 +179,44 @@ func (g *MGraph) BFSTraverse(visit func(vertex Vertex)) {
 				}
 			}
 		}
+	}
+}
+
+// Dijkstra算法
+func (g *MGraph) Dijkstra() {
+	var dis []int = make([]int, g.VertexNumber)
+	var res []bool = make([]bool, g.VertexNumber)
+	var min = 999
+	var index int
+
+	for i := 0; i < g.VertexNumber; i++ {
+		if g.ArcMatrix[0][i].Data == nil {
+			dis[i] = 999
+			continue
+		}
+		dis[i] = g.ArcMatrix[0][i].Data.(int)
+	}
+	res[0] = true
+
+	for i := 1; i < g.VertexNumber; i++ {
+		min = 999
+		for j := 0; j < g.VertexNumber; j++ {
+			if res[j] == false && dis[j] < min {
+				min = dis[j]
+				index = j
+			}
+		}
+		res[index] = true
+		for k := 0; k < g.VertexNumber; k++ {
+			if g.ArcMatrix[index][k].Data != 0 && g.ArcMatrix[index][k].Data != nil {
+				if dis[k] > dis[index]+g.ArcMatrix[index][k].Data.(int) {
+					dis[k] = dis[index] + g.ArcMatrix[index][k].Data.(int)
+				}
+			}
+		}
+	}
+
+	for i, re := range dis {
+		fmt.Println(i, ":", re)
 	}
 }
