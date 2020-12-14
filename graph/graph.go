@@ -192,9 +192,12 @@ func (g *MGraph) BFSTraverse(visit func(vertex Vertex) interface{}) (res []inter
 			for !q.IsEmpty() {
 				interfaceData, _ := q.Poll()
 				index := interfaceData.(int)
+				//fmt.Println(index)
 				for w, _ := g.FirstAdjVertex(index); w >= 0; w, _ = g.NextAdjVertex(index, w) {
+					//fmt.Println(w," ",index)
 					if !visited[w] {
 						visited[w] = true
+						//fmt.Println(g.Vertexes[w])
 						res = append(res, visit(g.Vertexes[w]))
 						q.Put(w)
 					}
